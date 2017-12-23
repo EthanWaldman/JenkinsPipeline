@@ -10,11 +10,7 @@ pipeline {
         }
         stage('Build') {
             steps {
-/*                sh 'mvn compile' */
-                  sh '''
-			echo "Forced failure!"
-			exit 1
-                  '''
+                sh 'mvn compile'
             }
         }
         stage('Unit Tests') {
