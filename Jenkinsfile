@@ -2,9 +2,9 @@ pipeline {
     agent any
     options { skipStagesAfterUnstable() }
     parameters {
-	string(name: 'SKIPTESTS',
-		defaultValue: 'No',
-		description: 'Set to Yes to have pipeline bypass test stages')
+	booleanParam(name: 'SKIPTESTS',
+		defaultValue: false,
+		description: 'Set to True to have pipeline bypass test stages')
     }
     
     stages {
@@ -22,7 +22,7 @@ pipeline {
             steps {
                 sh 'mvn test'
             }
-	    when { expression { params.SKIPTESTS != 'Yes' } }
+	    when { expression { params.SKIPTESTS } }
         }
         stage('Package') {
                 /* package goal will rerun the tests but keeping this structure as placeholder for explicit test runs */
@@ -75,6 +75,7 @@ spec:
 EOI
                 '''
                 kubernetesDeploy configs: 'deploypod', kubeConfig: [path: '/var/lib/jenkins/kubeconfig'], secretName: '', ssh: [sshCredentialsId: '*', sshServer: ''], textCredentials: [certificateAuthorityData: '', clientCertificateData: '', clientKeyData: '', serverUrl: 'https://']
+                sh 'echo "Status=$?"'
             }
         }
         stage('Verify') {
