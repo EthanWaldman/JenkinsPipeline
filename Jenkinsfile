@@ -58,23 +58,27 @@ EOI
         stage('Deploy') {
             steps  {
                 sh '''
-                    cat << EOI | sed 's/PODNAME/msdemo/' | sed 's/PODLABEL/msdemo/' | sed 's/JARNAME/microservice-demo/' > deploypod 
-apiVersion: v1bad
-kind: Podbad
+                    cat << EOI | sed 's/APPNAME/msdemo/' | sed 's/APPLABEL/msdemo/' | sed 's/JARNAME/microservice-demo/' > deployment.spec 
+apiVersion: v1
+kind: Deployment
 metadata:
-  name: PODNAME
-  labels:
-    name: PODLABEL
+  name: APPNAME
 spec:
-  containers:
-    - name: PODNAME
-      image: 192.168.33.33:5000/JARNAME:latest
-      ports:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        name: APPLABEL
+    spec:
+      containers:
+      - name: PODNAME
+        image: 192.168.33.33:5000/JARNAME:latest
+        ports:
         - containerPort: 8001
           hostPort: 81
 EOI
                 '''
-                kubernetesDeploy configs: 'deploypod', kubeConfig: [path: '/var/lib/jenkins/kubeconfig'], secretName: '', ssh: [sshCredentialsId: '*', sshServer: ''], textCredentials: [certificateAuthorityData: '', clientCertificateData: '', clientKeyData: '', serverUrl: 'https://']
+                kubernetesDeploy configs: 'deployment.spec', kubeConfig: [path: '/var/lib/jenkins/kubeconfig'], secretName: '', ssh: [sshCredentialsId: '*', sshServer: ''], textCredentials: [certificateAuthorityData: '', clientCertificateData: '', clientKeyData: '', serverUrl: 'https://']
             }
         }
         stage('Verify') {
