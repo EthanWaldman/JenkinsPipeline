@@ -22,7 +22,7 @@ pipeline {
             steps {
                 sh 'mvn test'
             }
-	    when { expression { params.SKIPTESTS } }
+	    when { expression { return params.SKIPTESTS } }
         }
         stage('Package') {
                 /* package goal will rerun the tests but keeping this structure as placeholder for explicit test runs */
