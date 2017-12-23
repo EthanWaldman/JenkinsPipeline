@@ -71,7 +71,7 @@ spec:
         name: APPLABEL
     spec:
       containers:
-      - name: PODNAME
+      - name: APPNAME
         image: 192.168.33.33:5000/JARNAME:latest
         ports:
         - containerPort: 8001
