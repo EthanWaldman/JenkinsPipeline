@@ -59,7 +59,7 @@ EOI
             steps  {
                 sh '''
                     cat << EOI | sed 's/APPNAME/msdemo/' | sed 's/APPLABEL/msdemo/' | sed 's/JARNAME/microservice-demo/' > deployment.spec 
-apiVersion: v1
+apiVersion: apps/v1beta
 kind: Deployment
 metadata:
   name: APPNAME
