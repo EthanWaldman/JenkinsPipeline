@@ -59,8 +59,8 @@ EOI
             steps  {
                 sh '''
                     cat << EOI | sed 's/PODNAME/msdemo/' | sed 's/PODLABEL/msdemo/' | sed 's/JARNAME/microservice-demo/' > deploypod 
-apiVersion: v1
-kind: Pod
+apiVersion: v1bad
+kind: Podbad
 metadata:
   name: PODNAME
   labels:
@@ -75,7 +75,6 @@ spec:
 EOI
                 '''
                 kubernetesDeploy configs: 'deploypod', kubeConfig: [path: '/var/lib/jenkins/kubeconfig'], secretName: '', ssh: [sshCredentialsId: '*', sshServer: ''], textCredentials: [certificateAuthorityData: '', clientCertificateData: '', clientKeyData: '', serverUrl: 'https://']
-                sh 'echo "Status=$?"'
             }
         }
         stage('Verify') {
