@@ -1,6 +1,11 @@
 pipeline {
     agent any
     options { skipStagesAfterUnstable() }
+    parameters {
+	string(name: 'SKIPTESTS',
+		defaultValue: 'No',
+		description: 'Set to Yes to have pipeline bypass test stages')
+    }
     
     stages {
         stage('Pull') {
@@ -17,11 +22,12 @@ pipeline {
             steps {
                 sh 'mvn test'
             }
-            post {
+	    when { expression { params.SKIPTESTS != 'Yes' } }
+        }
+        stage('Package') {
                 /* package goal will rerun the tests but keeping this structure as placeholder for explicit test runs */
-                success {
-                    sh 'mvn package'
-                }
+            steps {
+                sh 'mvn package'
             }
         }
         stage('Store Artifact') {
