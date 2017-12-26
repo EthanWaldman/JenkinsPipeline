@@ -57,7 +57,7 @@ EOI
                     docker tag ${SVCNAME}:${JAR_VERSION} 192.168.33.33:5000/${SVCNAME}:latest
                     docker push 192.168.33.33:5000/${SVCNAME}:latest
                 '''
-                stash name: "service-version", includes=".service_version"
+                stash name: "service-version", includes: ".service_version"
             }
         }
         stage('Deploy') {
