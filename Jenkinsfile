@@ -7,6 +7,7 @@ pipeline {
 		defaultValue: false,
 		description: 'Set to True to have pipeline bypass test stages')
     }
+    environment { SVCNAME = ${return params.ServiceName} }
     
     stages {
         stage('Pull') {
@@ -38,9 +39,9 @@ pipeline {
             steps {
 		unstash name: "jarfile"
                 sh '''
-                    JAR_FILE=`ls ${return params.ServiceName}-*.jar`
+                    JAR_FILE=`ls ${SVCNAME}-*.jar`
                     JAR_VERSION=`echo ${JAR_FILE} | sed 's/.jar$//' \
-                         | sed s/^${return params.ServiceName}//'`
+                         | sed s/^${SVCNAME}//'`
                     cat << EOI | sed "s/JARNAME/${JAR_FILE}/" > Dockerfile
 FROM docker.io/labengine/centos
 MAINTAINER Ethan ekwaldman@gmail.com
@@ -50,17 +51,17 @@ ADD JARNAME /
 EXPOSE 8001
 ENTRYPOINT java -jar /JARNAME registration 8001
 EOI
-                    docker build -t ${return params.ServiceName}:${JAR_VERSION} .
-                    docker tag ${return params.ServiceName}:${JAR_VERSION} ${return params.ServiceName}:latest
-                    docker tag ${return params.ServiceName}:${JAR_VERSION} 192.168.33.33:5000/${return params.ServiceName}:latest
-                    docker push 192.168.33.33:5000/${return params.ServiceName}:latest
+                    docker build -t ${SVCNAME}:${JAR_VERSION} .
+                    docker tag ${SVCNAME}:${JAR_VERSION} ${SVCNAME}:latest
+                    docker tag ${SVCNAME}:${JAR_VERSION} 192.168.33.33:5000/${SVCNAME}:latest
+                    docker push 192.168.33.33:5000/${SVCNAME}:latest
                 '''
             }
         }
         stage('Deploy') {
             steps  {
                 sh '''
-                    cat << EOI | sed 's/APPNAME/${return params.ServiceName}/' | sed 's/JARNAME/${return params.ServiceName}/' | sed 's/VERSION/latest/' > deployment.spec 
+                    cat << EOI | sed 's/APPNAME/${SVCNAME}/' | sed 's/JARNAME/${SVCNAME}/' | sed 's/VERSION/latest/' > deployment.spec 
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
