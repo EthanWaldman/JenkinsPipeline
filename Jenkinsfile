@@ -77,7 +77,7 @@ spec:
       labels:
         name: APPNAME
         service: APPNAME
-        version: VERSION
+        version: vVERSION
     spec:
       containers:
       - name: APPNAME
@@ -87,7 +87,7 @@ spec:
           hostPort: 81
 EOI
                 '''
-                kubernetesDeploy configs: 'deployment.spec', kubeConfig: [path: '/var/lib/jenkins/kubeconfig'], secretName: '', ssh: [sshCredentialsId: '*', sshServer: ''], textCredentials: [certificateAuthorityData: '', clientCertificateData: '', clientKeyData: '', serverUrl: 'https://']
+		sh 'kubectl --kubeconfig ~/kubeconfig -f deployment.spec'
             }
         }
         stage('Verify') {
