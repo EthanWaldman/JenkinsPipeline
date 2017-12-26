@@ -63,8 +63,8 @@ EOI
         stage('Deploy') {
             steps  {
 		unstash name: "service-version"
-		SERVICE_VERSION=`cat ./.service_version`
                 sh '''
+		    SERVICE_VERSION=`cat ./.service_version`
                     cat << EOI | sed 's/APPNAME/${SVCNAME}/' | sed 's/JARNAME/${SVCNAME}/' | sed 's/VERSION/${SERVICE_VERSION}/' > deployment.spec 
 apiVersion: extensions/v1beta1
 kind: Deployment
