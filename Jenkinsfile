@@ -43,7 +43,6 @@ pipeline {
                     JAR_VERSION=`echo ${JAR_FILE} | sed 's/.jar$//' \
                          | sed 's/^${SVCNAME}//'`
                     echo "${JAR_VERSION}" > .service_version
-                    stash name: "service-version", includes=".service_version"
                     cat << EOI | sed "s/JARNAME/${JAR_FILE}/" > Dockerfile
 FROM docker.io/labengine/centos
 MAINTAINER Ethan ekwaldman@gmail.com
@@ -58,6 +57,7 @@ EOI
                     docker tag ${SVCNAME}:${JAR_VERSION} 192.168.33.33:5000/${SVCNAME}:latest
                     docker push 192.168.33.33:5000/${SVCNAME}:latest
                 '''
+                stash name: "service-version", includes=".service_version"
             }
         }
         stage('Deploy') {
