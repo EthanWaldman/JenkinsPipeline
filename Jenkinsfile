@@ -12,7 +12,7 @@ pipeline {
     stages {
         stage('Pull') {
             steps {
-                git "https://github.com/paulc4/${return params.ServiceName}"
+                git "https://github.com/EthanWaldman/${return params.ServiceName}"
             }
         }
         stage('Build') {
