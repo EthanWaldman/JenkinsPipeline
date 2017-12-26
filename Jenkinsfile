@@ -42,6 +42,8 @@ pipeline {
                     JAR_FILE=`ls ${SVCNAME}-*.jar`
                     JAR_VERSION=`echo ${JAR_FILE} | sed 's/.jar$//' \
                          | sed 's/^${SVCNAME}//'`
+                    echo "${JAR_VERSION}" > .service_version
+                    stash name: "service-version", includes=".service_version"
                     cat << EOI | sed "s/JARNAME/${JAR_FILE}/" > Dockerfile
 FROM docker.io/labengine/centos
 MAINTAINER Ethan ekwaldman@gmail.com
@@ -60,8 +62,10 @@ EOI
         }
         stage('Deploy') {
             steps  {
+		unstash name: "service-version"
+		SERVICE_VERSION=`cat ./.service_version`
                 sh '''
-                    cat << EOI | sed 's/APPNAME/${SVCNAME}/' | sed 's/JARNAME/${SVCNAME}/' | sed 's/VERSION/latest/' > deployment.spec 
+                    cat << EOI | sed 's/APPNAME/${SVCNAME}/' | sed 's/JARNAME/${SVCNAME}/' | sed 's/VERSION/${SERVICE_VERSION}/' > deployment.spec 
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
