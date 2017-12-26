@@ -28,7 +28,9 @@ pipeline {
                 /* package goal will rerun the tests but keeping this structure as placeholder for explicit test runs */
             steps {
                 sh 'mvn package'
-		stash name: "jarfile", includes: "target/*.jar"
+		dir ("./target") {
+			stash name: "jarfile", includes: "*.jar"
+		}
             }
         }
         stage('Containerize') {
