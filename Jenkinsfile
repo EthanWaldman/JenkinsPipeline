@@ -2,12 +2,12 @@ pipeline {
     agent any
     options { skipStagesAfterUnstable() }
     parameters {
-	string(name: 'ServiceName', defaultValue: 'microservice-demo')
+	string(name: 'ServiceName', defaultValue: 'microservices-demo')
 	booleanParam(name: 'SkipTests',
 		defaultValue: false,
 		description: 'Set to True to have pipeline bypass test stages')
     }
-    environment { SVCNAME = "${return params.ServiceName}" }
+    environment { SVCNAME = "${ServiceName}" }
     
     stages {
         stage('Pull') {
