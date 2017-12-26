@@ -2,7 +2,8 @@ pipeline {
     agent any
     options { skipStagesAfterUnstable() }
     parameters {
-	booleanParam(name: 'SKIPTESTS',
+	string(name: 'ServiceName', defaultValue: 'microservice-demo')
+	booleanParam(name: 'SkipTests',
 		defaultValue: false,
 		description: 'Set to True to have pipeline bypass test stages')
     }
@@ -10,7 +11,7 @@ pipeline {
     stages {
         stage('Pull') {
             steps {
-                git 'https://github.com/paulc4/microservices-demo'
+                git "https://github.com/paulc4/${return params.ServiceName}"
             }
         }
         stage('Build') {
@@ -22,7 +23,7 @@ pipeline {
             steps {
                 sh 'mvn test'
             }
-	    when { expression { return !params.SKIPTESTS } }
+	    when { expression { return !params.SkipTests } }
         }
         stage('Package') {
                 /* package goal will rerun the tests but keeping this structure as placeholder for explicit test runs */
@@ -37,7 +38,9 @@ pipeline {
             steps {
 		unstash name: "jarfile"
                 sh '''
-                    JAR_FILE=`ls microservice-demo-*.jar`
+                    JAR_FILE=`ls ${return params.ServiceName}-*.jar`
+                    JAR_VERSION=`echo ${JAR_FILE} | sed 's/.jar$//' \
+                         | sed s/^${return params.ServiceName}//'`
                     cat << EOI | sed "s/JARNAME/${JAR_FILE}/" > Dockerfile
 FROM docker.io/labengine/centos
 MAINTAINER Ethan ekwaldman@gmail.com
@@ -47,16 +50,17 @@ ADD JARNAME /
 EXPOSE 8001
 ENTRYPOINT java -jar /JARNAME registration 8001
 EOI
-                    docker build -t microservice-demo:latest .
-                    docker tag microservice-demo:latest 192.168.33.33:5000/microservice-demo:latest
-                    docker push 192.168.33.33:5000/microservice-demo:latest
+                    docker build -t ${return params.ServiceName}:${JAR_VERSION} .
+                    docker tag ${return params.ServiceName}:${JAR_VERSION} ${return params.ServiceName}:latest
+                    docker tag ${return params.ServiceName}:${JAR_VERSION} 192.168.33.33:5000/${return params.ServiceName}:latest
+                    docker push 192.168.33.33:5000/${return params.ServiceName}:latest
                 '''
             }
         }
         stage('Deploy') {
             steps  {
                 sh '''
-                    cat << EOI | sed 's/APPNAME/msdemo/' | sed 's/APPLABEL/msdemo/' | sed 's/JARNAME/microservice-demo/' > deployment.spec 
+                    cat << EOI | sed 's/APPNAME/${return params.ServiceName}/' | sed 's/JARNAME/${return params.ServiceName}/' | sed 's/VERSION/latest/' > deployment.spec 
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
@@ -66,7 +70,9 @@ spec:
   template:
     metadata:
       labels:
-        name: APPLABEL
+        name: APPNAME
+        service: APPNAME
+        version: VERSION
     spec:
       containers:
       - name: APPNAME
