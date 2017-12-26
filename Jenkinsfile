@@ -28,18 +28,14 @@ pipeline {
                 /* package goal will rerun the tests but keeping this structure as placeholder for explicit test runs */
             steps {
                 sh 'mvn package'
-            }
-        }
-        stage('Store Artifact') {
-            steps {
-                    sh 'cp target/*.jar /var/tmp/localrepo'
+		stash name: "jarfile", includes: "target/*.jar"
             }
         }
         stage('Containerize') {
             steps {
+		unstash name: "jarfile"
                 sh '''
-                    cp /var/tmp/localrepo/microservice-demo-* .
-                    JAR_FILE=`ls microservice-demo-*`
+                    JAR_FILE=`ls microservice-demo-*.jar`
                     cat << EOI | sed "s/JARNAME/${JAR_FILE}/" > Dockerfile
 FROM docker.io/labengine/centos
 MAINTAINER Ethan ekwaldman@gmail.com
