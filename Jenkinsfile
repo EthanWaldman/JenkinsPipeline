@@ -7,7 +7,7 @@ pipeline {
 		defaultValue: false,
 		description: 'Set to True to have pipeline bypass test stages')
     }
-    environment { SVCNAME = ${return params.ServiceName} }
+    environment { SVCNAME = "${return params.ServiceName}" }
     
     stages {
         stage('Pull') {
