@@ -41,7 +41,7 @@ pipeline {
                 sh '''
                     JAR_FILE=`ls ${SVCNAME}-*.jar`
                     JAR_VERSION=`echo ${JAR_FILE} | sed 's/.jar$//' \
-                         | sed s/^${SVCNAME}//'`
+                         | sed 's/^${SVCNAME}//'`
                     cat << EOI | sed "s/JARNAME/${JAR_FILE}/" > Dockerfile
 FROM docker.io/labengine/centos
 MAINTAINER Ethan ekwaldman@gmail.com
