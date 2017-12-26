@@ -87,7 +87,7 @@ spec:
           hostPort: 81
 EOI
                 '''
-		sh 'kubectl --kubeconfig ~/kubeconfig -f deployment.spec'
+		sh 'kubectl --kubeconfig ~/kubeconfig create -f deployment.spec'
             }
         }
         stage('Verify') {
