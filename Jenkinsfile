@@ -43,14 +43,14 @@ pipeline {
                     JAR_VERSION=`echo ${JAR_FILE} | sed 's/.jar$//' \
                          | sed 's/^${SVCNAME}//'`
                     echo "${JAR_VERSION}" > .service_version
-                    cat << EOI | sed "s/JARNAME/${JAR_FILE}/" > Dockerfile
+                    cat << EOI | sed "s/_JARNAME_/${JAR_FILE}/" > Dockerfile
 FROM docker.io/labengine/centos
 MAINTAINER Ethan ekwaldman@gmail.com
 #
 RUN yum install -y java-1.8.0-openjdk
-ADD JARNAME /
+ADD _JARNAME_ /
 EXPOSE 8001
-ENTRYPOINT java -jar /JARNAME registration 8001
+ENTRYPOINT java -jar /_JARNAME_ registration 8001
 EOI
                     docker build -t ${SVCNAME}:${JAR_VERSION} .
                     docker tag ${SVCNAME}:${JAR_VERSION} ${SVCNAME}:latest
@@ -65,23 +65,23 @@ EOI
 		unstash name: "service-version"
                 sh '''
 		    SERVICE_VERSION=`cat ./.service_version`
-                    cat << EOI | sed 's/APPNAME/${SVCNAME}/' | sed 's/JARNAME/${SVCNAME}/' | sed 's/VERSION/${SERVICE_VERSION}/' > deployment.spec 
+                    cat << EOI | sed "s/_APPNAME_/${SVCNAME}/" | sed "s/_VERSION_/${SERVICE_VERSION}/" > deployment.spec 
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: APPNAME
+  name: _APPNAME_
 spec:
   replicas: 2
   template:
     metadata:
       labels:
-        name: APPNAME
-        service: APPNAME
-        version: vVERSION
+        name: _APPNAME_
+        service: _APPNAME_
+        version: v_VERSION_
     spec:
       containers:
-      - name: APPNAME
-        image: 192.168.33.33:5000/JARNAME:latest
+      - name: _APPNAME_
+        image: 192.168.33.33:5000/_APPNAME_:_VERSION_
         ports:
         - containerPort: 8001
           hostPort: 81
