@@ -97,7 +97,7 @@ EOI
 				VERB=create
 			fi
                         set -e
-			kubectl --kubeconfig ~/kubeconfig ${VERB} -f deployment.spec'
+			kubectl --kubeconfig ~/kubeconfig ${VERB} -f deployment.spec
 		'''
             }
         }
