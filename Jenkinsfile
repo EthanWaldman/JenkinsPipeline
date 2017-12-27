@@ -89,7 +89,7 @@ EOI
                 '''
 		sh '''
                         set +e
-			kubectl get deployment ${SVCNAME}
+			kubectl --kubeconfig ~/kubeconfig get deployment ${SVCNAME}
 			if [ $? -eq 0 ]
 			then
 				VERB=update
