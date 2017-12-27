@@ -88,6 +88,7 @@ spec:
 EOI
                 '''
 		sh '''
+                        set +e
 			kubectl get deployment ${SVCNAME}
 			if [ $? -eq 0 ]
 			then
@@ -95,6 +96,7 @@ EOI
 			else
 				VERB=create
 			fi
+                        set -e
 			kubectl --kubeconfig ~/kubeconfig ${VERB} -f deployment.spec'
 		'''
             }
