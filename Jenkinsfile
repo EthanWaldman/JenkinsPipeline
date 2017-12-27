@@ -54,8 +54,8 @@ ENTRYPOINT java -jar /_JARNAME_ registration 8001
 EOI
                     docker build -t ${SVCNAME}:${JAR_VERSION} .
                     docker tag ${SVCNAME}:${JAR_VERSION} ${SVCNAME}:latest
-                    docker tag ${SVCNAME}:${JAR_VERSION} 192.168.33.33:5000/${SVCNAME}:latest
-                    docker push 192.168.33.33:5000/${SVCNAME}:latest
+                    docker tag ${SVCNAME}:${JAR_VERSION} 192.168.33.33:5000/${SVCNAME}:${JAR_VERSION}
+                    docker push 192.168.33.33:5000/${SVCNAME}:${JAR_VERSION}
                 '''
                 stash name: "service-version", includes: ".service_version"
             }
@@ -87,7 +87,16 @@ spec:
           hostPort: 81
 EOI
                 '''
-		sh 'kubectl --kubeconfig ~/kubeconfig update -f deployment.spec'
+		sh '''
+			kubectl get deployment ${SVCNAME}
+			if [ $? -eq 0 ]
+			then
+				VERB=update
+			else
+				VERB=create
+			fi
+			kubectl --kubeconfig ~/kubeconfig ${VERB} -f deployment.spec'
+		'''
             }
         }
         stage('Verify') {
