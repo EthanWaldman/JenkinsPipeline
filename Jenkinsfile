@@ -103,7 +103,7 @@ EOI
         }
         stage('Verify') {
             steps {
-                timeout(time: 300, unit: 'SECONDS') {
+                timeout(time: 600, unit: 'SECONDS') {
                     sh '''
                         STATUS=-1
                         while [ ${STATUS} -ne 0 ]
