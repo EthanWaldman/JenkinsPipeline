@@ -1,5 +1,6 @@
 pipeline {
     agent any
+    tools { maven 'apache-maven-3.5.2' }
     options { skipStagesAfterUnstable() }
     parameters {
 	string(name: 'ServiceName', defaultValue: 'microservices-demo')
