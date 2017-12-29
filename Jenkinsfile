@@ -53,6 +53,7 @@ ADD _JARNAME_ /
 EXPOSE 8001
 ENTRYPOINT java -jar /_JARNAME_ registration 8001
 EOI
+                    export DOCKER_HOST=192.168.33.33
                     docker build -t ${SVCNAME}:${JAR_VERSION} .
                     docker tag ${SVCNAME}:${JAR_VERSION} ${SVCNAME}:latest
                     docker tag ${SVCNAME}:${JAR_VERSION} 192.168.33.33:5000/${SVCNAME}:${JAR_VERSION}
@@ -64,6 +65,24 @@ EOI
         stage('Deploy') {
             steps  {
 		unstash name: "service-version"
+		sh '''
+			cat << EOI > kubeconfig
+apiVersion: v1
+clusters:
+- cluster:
+    server: http://192.168.33.41:8080
+  name: lab
+contexts:
+- context:
+    cluster: lab
+    user: ""
+  name: lab
+current-context: lab
+kind: Config
+preferences: {}
+users: []
+EOI
+		'''
                 sh '''
 		    SERVICE_VERSION=`cat ./.service_version`
                     cat << EOI | sed "s/_APPNAME_/${SVCNAME}/" | sed "s/_VERSION_/${SERVICE_VERSION}/" > deployment.spec 
@@ -89,16 +108,16 @@ spec:
 EOI
                 '''
 		sh '''
-                        set +e
-			kubectl --kubeconfig ~/kubeconfig get deployment ${SVCNAME}
-			if [ $? -eq 0 ]
-			then
-				VERB=update
-			else
-				VERB=create
-			fi
-                        set -e
-			kubectl --kubeconfig ~/kubeconfig ${VERB} -f deployment.spec
+#                        set +e
+#			kubectl --kubeconfig ~/kubeconfig get deployment ${SVCNAME}
+#			if [ $? -eq 0 ]
+#			then
+#				VERB=update
+#			else
+#				VERB=create
+#			fi
+#                        set -e
+			kubectl --kubeconfig ./kubeconfig apply -f deployment.spec
 		'''
             }
         }
