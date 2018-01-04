@@ -15,6 +15,12 @@ pipeline {
                 sh 'echo ${JOB_BASE_NAME} | cut -d"-" -f2- > .microservice_name'
             }
         }
+        stage('Pull') {
+            steps {
+                sh 'env'
+                git "https://github.com/EthanWaldman/${readFile('.microservice_name')}"
+            }
+        }
         stage('Build') {
             steps {
                 sh 'mvn compile'
