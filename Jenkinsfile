@@ -3,7 +3,6 @@ pipeline {
     tools { maven 'Default' }
     options { skipStagesAfterUnstable() }
     parameters {
-	string(name: 'ServiceName', defaultValue: 'microservices-demo')
 	booleanParam(name: 'SkipTests',
 		defaultValue: false,
 		description: 'Set to True to have pipeline bypass test stages')
