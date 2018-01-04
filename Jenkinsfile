@@ -8,12 +8,11 @@ pipeline {
 		defaultValue: false,
 		description: 'Set to True to have pipeline bypass test stages')
     }
-    environment { SVCNAME = "${ServiceName}" }
     
     stages {
-        stage('Pull') {
+        stage('Initialize') {
             steps {
-                git "https://github.com/EthanWaldman/${return params.ServiceName}"
+                sh 'echo ${JOB_BASE_NAME} | cut -d"-" -f2- > .microservice_name'
             }
         }
         stage('Build') {
@@ -37,6 +36,7 @@ pipeline {
             }
         }
         stage('Containerize') {
+            environment { SVCNAME = readFile('.microservice_name') }
             steps {
 		unstash name: "jarfile"
                 sh '''
@@ -63,6 +63,7 @@ EOI
             }
         }
         stage('Deploy') {
+            environment { SVCNAME = readFile('.microservice_name') }
             steps  {
 		unstash name: "service-version"
 		sh '''
