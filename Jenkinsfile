@@ -11,7 +11,7 @@ pipeline {
     stages {
         stage('Initialize') {
             steps {
-                sh 'echo ${JOB_BASE_NAME} | cut -d"-" -f2- > .microservice_name'
+                sh 'NAME=`echo ${JOB_BASE_NAME} | cut -d"-" -f2-`; echo -n $NAME > .microservice_name'
             }
         }
         stage('Pull') {
