@@ -3,6 +3,11 @@ pipeline {
     tools { maven 'Default' }
     options { skipStagesAfterUnstable() }
     parameters {
+	stringParam(name: 'Version',
+		defaultValue: 'latest',
+		description: 'version of microservice to build and deploy')
+	stringParam(name: 'OverrideLastDeploymentEnv',
+		description: 'If defined, override normal policy rule for final environment to deploy to')
 	booleanParam(name: 'SkipTests',
 		defaultValue: false,
 		description: 'Set to True to have pipeline bypass test stages')
