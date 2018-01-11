@@ -26,10 +26,10 @@ pipeline {
             }
         }
         stage('Build') {
-            script {
-               input 'Ok to Build?'
-            }
             steps {
+                script {
+                   input 'Ok to Build?'
+                }
                 sh 'mvn compile'
             }
         }
